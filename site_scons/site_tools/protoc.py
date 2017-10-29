@@ -135,7 +135,6 @@ _protoc_builder = Builder(
 
 def generate(env):
     """Add Builders and construction variables."""
-    
     env['PROTOC'] = _detect(env)
     env.SetDefault(
 
