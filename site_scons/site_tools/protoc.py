@@ -12,25 +12,20 @@ protoc_cc = env.Protoc(["src/Example.proto"],
 
 import os
 import SCons.Util
-from SCons.Script import Builder, Action, Dir, File, Entry
+from SCons.Script import Builder, Action
 
 def _detect(env):
     """Try to find the Protoc compiler"""
-    try:
-        return env['PROTOC']
-    except KeyError:
-        pass
-
-    protoc = env.WhereIs('protoc')
+    protoc = env.get('PROTOC') or env.Detect('protoc')
     if protoc:
         return protoc
-
     raise SCons.Errors.StopError(
         "Could not detect protoc Compiler")
 
 def _protoc_emitter(target, source, env):
     """Process target, sources, and flags"""
-    
+    from SCons.Script import File, Dir
+
     # always ignore target
     target = []
 
@@ -44,7 +39,8 @@ def _protoc_emitter(target, source, env):
     # fetch all protoc flags
     if env['PROTOC_FLAGS']:
         protocflags = env.subst("$PROTOC_FLAGS",
-            target=target, source=source)
+                                target=target,
+                                source=source)
         flags = SCons.Util.CLVar(protocflags)
     else:
         flags = SCons.Util.CLVar('')
@@ -69,7 +65,7 @@ def _protoc_emitter(target, source, env):
     if env['PROTOC_CCOUT']:
         env['PROTOC_CCOUT'] = Dir(env['PROTOC_CCOUT'])
         flags.append('--cpp_out=${PROTOC_CCOUT.abspath}')
-    
+
     # flag --python_out
     if env['PROTOC_PYOUT']:
         env['PROTOC_PYOUT'] = Dir(env['PROTOC_PYOUT'])
@@ -83,10 +79,6 @@ def _protoc_emitter(target, source, env):
     # updated flags
     env['PROTOC_FLAGS'] = str(flags)
     #print "flags:",flags
-
-    # source scons dirs
-    src_struct = Dir('#')
-    src_script = Dir('.').srcnode()
 
     # produce proper targets
     for src in source:
