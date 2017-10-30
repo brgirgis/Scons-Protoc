@@ -38,9 +38,14 @@ def _protoc_emitter(target, source, env):
     
     # suffix
     protoc_suffix = env.subst('$PROTOC_SUFFIX')
+    
     protoc_h_suffix = env.subst('$PROTOC_HSUFFIX')
     protoc_cc_suffix = env.subst('$PROTOC_CCSUFFIX')
+    protoc_grpc_h_suffix = env.subst('$PROTOC_GRPC_HSUFFIX')
+    protoc_grpc_cc_suffix = env.subst('$PROTOC_GRPC_CCSUFFIX')
+    
     protoc_py_suffix = env.subst('$PROTOC_PYSUFFIX')
+    protoc_grpc_py_suffix = env.subst('$PROTOC_GRPC_PYSUFFIX')
     
     # fetch all protoc flags
     if env['PROTOC_FLAGS']:
@@ -51,15 +56,35 @@ def _protoc_emitter(target, source, env):
     else:
         flags = SCons.Util.CLVar('')
     
+    # flag --plugin=protoc-gen-grpc-cpp
+    if env['PROTOC_GRPC_CC']:
+        env['PROTOC_GRPC_CC'] = File(env['PROTOC_GRPC_CC'])
+        flags.append('--plugin=protoc-gen-grpc-cpp=${PROTOC_GRPC_CC.abspath}')
+    
     # flag --cpp_out
     if env['PROTOC_CCOUT']:
         env['PROTOC_CCOUT'] = Dir(env['PROTOC_CCOUT'])
         flags.append('--cpp_out=${PROTOC_CCOUT.abspath}')
     
+    # flag --grpc-cpp_out
+    if env['PROTOC_GRPC_CCOUT']:
+        env['PROTOC_GRPC_CCOUT'] = Dir(env['PROTOC_GRPC_CCOUT'])
+        flags.append('--grpc-cpp_out=${PROTOC_GRPC_CCOUT.abspath}')
+    
+    # flag --plugin=protoc-gen-grpc-python
+    if env['PROTOC_GRPC_PY']:
+        env['PROTOC_GRPC_PY'] = File(env['PROTOC_GRPC_PY'])
+        flags.append('--plugin=protoc-gen-grpc-python=${PROTOC_GRPC_PY.abspath}')
+    
     # flag --python_out
     if env['PROTOC_PYOUT']:
         env['PROTOC_PYOUT'] = Dir(env['PROTOC_PYOUT'])
         flags.append('--python_out=${PROTOC_PYOUT.abspath}')
+    
+    # flag --grpc-python_out
+    if env['PROTOC_GRPC_PYOUT']:
+        env['PROTOC_GRPC_PYOUT'] = Dir(env['PROTOC_GRPC_PYOUT'])
+        flags.append('--grpc-python_out=${PROTOC_GRPC_PYOUT.abspath}')
     
     # flag --proto_path, -I
     proto_path = []
@@ -95,14 +120,25 @@ def _protoc_emitter(target, source, env):
         if env['PROTOC_CCOUT']:
             out = Dir(env['PROTOC_CCOUT'])
             base = os.path.join(out.abspath, stem)
-            target.append(File(base+protoc_h_suffix))
-            target.append(File(base+protoc_cc_suffix))
+            target.append(File(base + protoc_h_suffix))
+            target.append(File(base + protoc_cc_suffix))
+        
+        if env['PROTOC_GRPC_CCOUT']:
+            out = Dir(env['PROTOC_GRPC_CCOUT'])
+            base = os.path.join(out.abspath, stem)
+            target.append(File(base + protoc_grpc_h_suffix))
+            target.append(File(base + protoc_grpc_cc_suffix))
         
         # python output, append
         if env['PROTOC_PYOUT']:
             out = Dir(env['PROTOC_PYOUT'])
             base = os.path.join(out.abspath, stem)
-            target.append(File(base+protoc_py_suffix))
+            target.append(File(base + protoc_py_suffix))
+        
+        if env['PROTOC_GRPC_PYOUT']:
+            out = Dir(env['PROTOC_GRPC_PYOUT'])
+            base = os.path.join(out.abspath, stem)
+            target.append(File(base + protoc_grpc_py_suffix))
         
     
     for path in proto_path:
@@ -142,22 +178,34 @@ def generate(env):
         # Source path(s)
         PROTOC_PATH = SCons.Util.CLVar(''),
         
+        # Plugins path
+        PROTOC_GRPC_CC = '',
+        PROTOC_GRPC_PY = '',
+        
         # Output path
         PROTOC_CCOUT = '',
+        PROTOC_GRPC_CCOUT = '',
+        
         PROTOC_PYOUT = '',
-        PROTOC_JAVAOUT = '',
+        PROTOC_GRPC_PYOUT = '',
         
         # Suffixies / prefixes
         PROTOC_SUFFIX = '.proto',
+        
+        # C++
         PROTOC_HSUFFIX = '.pb.h',
         PROTOC_CCSUFFIX = '.pb.cc',
+        PROTOC_GRPC_HSUFFIX = '.grpc.pb.h',
+        PROTOC_GRPC_CCSUFFIX = '.grpc.pb.cc',
+        
+        # Python
         PROTOC_PYSUFFIX = '_pb2.py',
+        PROTOC_GRPC_PYSUFFIX = '_pb2_grpc.py',
         
         # Protoc command
         PROTOC_COM = "$PROTOC $PROTOC_FLAGS $SOURCES.abspath",
         PROTOC_COMSTR = '',
         
-        PROTOC_DEBUG = False,
     )
     
     env['BUILDERS']['Protoc'] = _protoc_builder

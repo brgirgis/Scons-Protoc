@@ -91,6 +91,11 @@ class BuildPath(object):
     self.__grpcLibPaths = [os.path.join(__grpcInstall, 'lib'),
                            os.path.join(__grpcInstall, 'lib64')]
     
+    __grpcPluginsPath = os.path.join(__grpcInstall, 'plugins')
+    self.__grpcCPPPlugin = os.path.join(__grpcPluginsPath, 'grpc_cpp_plugin')
+    self.__grpcPythonPlugin = os.path.join(__grpcPluginsPath, 'grpc_python_plugin')
+    
+    
     def _exist(path):
       if not os.path.exists(path):
         os.makedirs(path)
@@ -122,6 +127,14 @@ class BuildPath(object):
   def grpcLibPaths(self):
     return self.__grpcLibPaths
   
+  @property
+  def grpcCPPPlugin(self):
+    return self.__grpcCPPPlugin
+  
+  @property
+  def grpcPythonPlugin(self):
+    return self.__grpcPythonPlugin
+  
   def summary(self):
     lstr = '='*50 + '\n'
     lstr += 'Paths Summary\n'
@@ -147,6 +160,8 @@ VariantDir(variant_dir=pathObj.buildDir,
 env = Environment(
   tools=['default', 'protoc'],
   PROTOC=pathObj.protocExePath,
+  PROTOC_GRPC_CC = pathObj.grpcCPPPlugin,
+  PROTOC_GRPC_PY = pathObj.grpcPythonPlugin,
   PROTOC_DEBUG=True,
   CPPPATH=pathObj.grpcIncludePaths,
   LIBPATH=pathObj.grpcLibPaths
