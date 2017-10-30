@@ -1,0 +1,7 @@
+Import('env')
+
+protoc_cc = env.Protoc(["../protos/helloworld.proto"],
+                       PROTOC_CCOUT=env.pathObj.buildDir,
+                       PROTOC_PYOUT=env.pathObj.buildDir,
+                       #PROTOC_JAVAOUT=env.pathObj.buildDir
+                       )
