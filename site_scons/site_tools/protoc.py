@@ -41,7 +41,6 @@ def _protoc_emitter(target, source, env):
     protoc_h_suffix = env.subst('$PROTOC_HSUFFIX')
     protoc_cc_suffix = env.subst('$PROTOC_CCSUFFIX')
     protoc_py_suffix = env.subst('$PROTOC_PYSUFFIX')
-    protoc_java_suffix = env.subst('$PROTOC_JAVASUFFIX')
     
     # fetch all protoc flags
     if env['PROTOC_FLAGS']:
@@ -61,11 +60,6 @@ def _protoc_emitter(target, source, env):
     if env['PROTOC_PYOUT']:
         env['PROTOC_PYOUT'] = Dir(env['PROTOC_PYOUT'])
         flags.append('--python_out=${PROTOC_PYOUT.abspath}')
-    
-    # flag --java_out
-    if env['PROTOC_JAVAOUT']:
-        env['PROTOC_JAVAOUT'] = Dir(env['PROTOC_JAVAOUT'])
-        flags.append('--java_out=${PROTOC_JAVAOUT.abspath}')
     
     # flag --proto_path, -I
     proto_path = []
@@ -109,12 +103,6 @@ def _protoc_emitter(target, source, env):
             out = Dir(env['PROTOC_PYOUT'])
             base = os.path.join(out.abspath, stem)
             target.append(File(base+protoc_py_suffix))
-        
-        # java output, append
-        if env['PROTOC_JAVAOUT']:
-            out = Dir(env['PROTOC_JAVAOUT'])
-            base = os.path.join(out.abspath, stem)
-            target.append(File(base+protoc_java_suffix))
         
     
     for path in proto_path:
@@ -164,7 +152,6 @@ def generate(env):
         PROTOC_HSUFFIX = '.pb.h',
         PROTOC_CCSUFFIX = '.pb.cc',
         PROTOC_PYSUFFIX = '_pb2.py',
-        PROTOC_JAVASUFFIX = '.java',
         
         # Protoc command
         PROTOC_COM = "$PROTOC $PROTOC_FLAGS $SOURCES.abspath",
