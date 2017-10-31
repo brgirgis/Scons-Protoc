@@ -102,9 +102,15 @@ class BuildPath(object):
       return path
     
     # build variables
-    self.__buildDir = _exist(os.path.join(self.__srcDir,
-                                          'build',
-                                          archObj.sysDirName))
+    self.__buildDir = os.path.join(self.__srcDir,
+                                   'build',
+                                   archObj.sysDirName)
+    self.__buildGenDir = os.path.join(self.__buildDir,
+                                      'gen')
+    self.__buildGenCCDir = _exist(os.path.join(self.__buildGenDir,
+                                               'cc'))
+    self.__buildGenPYDir = _exist(os.path.join(self.__buildGenDir,
+                                               'py'))
     
   
   @property
@@ -114,6 +120,18 @@ class BuildPath(object):
   @property
   def buildDir(self):
     return self.__buildDir
+  
+  @property
+  def buildGenDir(self):
+    return self.__buildGenDir
+  
+  @property
+  def buildGenCCDir(self):
+    return self.__buildGenCCDir
+  
+  @property
+  def buildGenPYDir(self):
+    return self.__buildGenPYDir
   
   @property
   def protocExePath(self):
@@ -163,7 +181,7 @@ env = Environment(
   PROTOC_GRPC_CC = pathObj.grpcCPPPlugin,
   PROTOC_GRPC_PY = pathObj.grpcPythonPlugin,
   PROTOC_DEBUG=True,
-  CPPPATH=pathObj.grpcIncludePaths + [pathObj.buildDir],
+  CPPPATH=pathObj.grpcIncludePaths + [pathObj.buildGenCCDir],
   LIBPATH=pathObj.grpcLibPaths
   )
 env.pathObj = pathObj

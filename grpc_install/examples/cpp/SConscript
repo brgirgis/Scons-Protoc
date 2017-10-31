@@ -1,10 +1,10 @@
 Import('env')
 
 protoc_out = env.Protoc(["../protos/helloworld.proto"],
-                       PROTOC_CCOUT=env.pathObj.buildDir,
-                       PROTOC_GRPC_CCOUT=env.pathObj.buildDir,
-                       PROTOC_PYOUT=env.pathObj.buildDir,
-                       PROTOC_GRPC_PYOUT=env.pathObj.buildDir,
+                       PROTOC_CCOUT=env.pathObj.buildGenCCDir,
+                       PROTOC_GRPC_CCOUT=env.pathObj.buildGenCCDir,
+                       PROTOC_PYOUT=env.pathObj.buildGenPYDir,
+                       PROTOC_GRPC_PYOUT=env.pathObj.buildGenPYDir,
                       )
 
 protoc_c = []
@@ -13,46 +13,39 @@ for file in protoc_out:
     continue
   protoc_c.append(file)
 
-prog = env.Program(target='greeter_client',
-                   source=['helloworld/greeter_client.cc',
-                           protoc_c],
-                   LIBS=['protobuf',
-                         'grpc++',
-                         #'grpc++_reflection',
-                         #'grpc++_unsecure',
-                         #'grpc++_cronet',
-                         'grpc',
-                         #'gflags',
-                         #'grpc_unsecure',
-                         #'grpc_cronet',
-                         'gpr',
-                         'z',
-                         'pthread',
-                         #'dl',
-                         'ssl',
-                         'cares',
-                         'crypto'
-                         ],
-                   )
+libs = [
+  'protobuf',
+  'grpc++',
+  #'grpc++_reflection',
+  #'grpc++_unsecure',
+  #'grpc++_cronet',
+  'grpc',
+  #'gflags',
+  #'grpc_unsecure',
+  #'grpc_cronet',
+  'gpr',
+  'z',
+  'pthread',
+  #'dl',
+  'ssl',
+  'cares',
+  'crypto'
+]
 
-lib = env.SharedLibrary(target='greeter_client_shared',
-                   source=['helloworld/greeter_client2.cc',
-                           protoc_c],
-                   LIBS=['protobuf',
-                         'grpc++',
-                         #'grpc++_reflection',
-                         #'grpc++_unsecure',
-                         #'grpc++_cronet',
-                         'grpc',
-                         #'gflags',
-                         #'grpc_unsecure',
-                         #'grpc_cronet',
-                         'gpr',
-                         'z',
-                         'pthread',
-                         #'dl',
-                         'ssl',
-                         'cares',
-                         'crypto'
-                         ],
-                   )
+env.Program(target='greeter_client',
+            source=['helloworld/greeter_client.cc',
+                    protoc_c],
+            LIBS=libs,
+           )
+
+env.Program(target='greeter_server',
+            source=['helloworld/greeter_server.cc',
+                    protoc_c],
+            LIBS=libs,
+           )
+
+env.SharedLibrary(target='greeter_client_shared',
+                  source=['helloworld/greeter_client2.cc',
+                          protoc_c],
+                  LIBS=libs,
+                  )
