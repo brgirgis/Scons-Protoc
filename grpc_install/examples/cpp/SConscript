@@ -1,8 +1,58 @@
 Import('env')
 
-protoc_cc = env.Protoc(["../protos/helloworld.proto"],
+protoc_out = env.Protoc(["../protos/helloworld.proto"],
                        PROTOC_CCOUT=env.pathObj.buildDir,
                        PROTOC_GRPC_CCOUT=env.pathObj.buildDir,
                        PROTOC_PYOUT=env.pathObj.buildDir,
                        PROTOC_GRPC_PYOUT=env.pathObj.buildDir,
-                       )
+                      )
+
+protoc_c = []
+for file in protoc_out:
+  if '.cc' not in str(file):
+    continue
+  protoc_c.append(file)
+
+prog = env.Program(target='greeter_client',
+                   source=['helloworld/greeter_client.cc',
+                           protoc_c],
+                   LIBS=['protobuf',
+                         'grpc++',
+                         #'grpc++_reflection',
+                         #'grpc++_unsecure',
+                         #'grpc++_cronet',
+                         'grpc',
+                         #'gflags',
+                         #'grpc_unsecure',
+                         #'grpc_cronet',
+                         'gpr',
+                         'z',
+                         'pthread',
+                         #'dl',
+                         'ssl',
+                         'cares',
+                         'crypto'
+                         ],
+                   )
+
+lib = env.SharedLibrary(target='greeter_client_shared',
+                   source=['helloworld/greeter_client2.cc',
+                           protoc_c],
+                   LIBS=['protobuf',
+                         'grpc++',
+                         #'grpc++_reflection',
+                         #'grpc++_unsecure',
+                         #'grpc++_cronet',
+                         'grpc',
+                         #'gflags',
+                         #'grpc_unsecure',
+                         #'grpc_cronet',
+                         'gpr',
+                         'z',
+                         'pthread',
+                         #'dl',
+                         'ssl',
+                         'cares',
+                         'crypto'
+                         ],
+                   )

@@ -163,7 +163,7 @@ env = Environment(
   PROTOC_GRPC_CC = pathObj.grpcCPPPlugin,
   PROTOC_GRPC_PY = pathObj.grpcPythonPlugin,
   PROTOC_DEBUG=True,
-  CPPPATH=pathObj.grpcIncludePaths,
+  CPPPATH=pathObj.grpcIncludePaths + [pathObj.buildDir],
   LIBPATH=pathObj.grpcLibPaths
   )
 env.pathObj = pathObj
