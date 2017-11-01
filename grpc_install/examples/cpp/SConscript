@@ -25,12 +25,21 @@ libs = [
   #'grpc_cronet',
   'gpr',
   'z',
-  'pthread',
-  #'dl',
   'ssl',
   'cares',
   'crypto'
 ]
+
+if env.archObj.isLinux:
+  libs += [
+    'pthread',
+    #'dl',
+  ]
+else:
+  libs += [
+  'Advapi32',
+  ]
+
 
 env.Program(target='greeter_client',
             source=['helloworld/greeter_client.cc',
@@ -43,9 +52,10 @@ env.Program(target='greeter_server',
                     protoc_c],
             LIBS=libs,
            )
-
+'''
 env.SharedLibrary(target='greeter_client_shared',
                   source=['helloworld/greeter_client2.cc',
                           protoc_c],
                   LIBS=libs,
                   )
+'''

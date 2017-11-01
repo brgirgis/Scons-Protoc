@@ -10,6 +10,8 @@ protoc_cc = env.Protoc(["src/Example.proto"],
 
 """
 
+from __future__ import print_function
+
 import os
 import SCons.Util
 from SCons.Script import Builder, Action

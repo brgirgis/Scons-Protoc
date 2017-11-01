@@ -88,13 +88,13 @@ class BuildPath(object):
                                         'bin',
                                         'protoc')
     self.__grpcIncludePaths = [os.path.join(__grpcInstall, 'include')]
-    self.__grpcLibPaths = [os.path.join(__grpcInstall, 'lib'),
-                           os.path.join(__grpcInstall, 'lib64')]
+    self.__grpcLibPaths = [os.path.join(__grpcInstall, 'lib')]
     
     __grpcPluginsPath = os.path.join(__grpcInstall, 'plugins')
-    self.__grpcCPPPlugin = os.path.join(__grpcPluginsPath, 'grpc_cpp_plugin')
-    self.__grpcPythonPlugin = os.path.join(__grpcPluginsPath, 'grpc_python_plugin')
     
+    _pluginExt = '.exe' if archObj.isWindows else ''
+    self.__grpcCPPPlugin = os.path.join(__grpcPluginsPath, 'grpc_cpp_plugin' + _pluginExt)
+    self.__grpcPythonPlugin = os.path.join(__grpcPluginsPath, 'grpc_python_plugin' + _pluginExt)
     
     def _exist(path):
       if not os.path.exists(path):
@@ -176,6 +176,7 @@ VariantDir(variant_dir=pathObj.buildDir,
            duplicate=0)
 
 env = Environment(
+  ENV=os.environ,
   tools=['default', 'protoc'],
   PROTOC=pathObj.protocExePath,
   PROTOC_GRPC_CC = pathObj.grpcCPPPlugin,
@@ -184,8 +185,12 @@ env = Environment(
   CPPPATH=pathObj.grpcIncludePaths + [pathObj.buildGenCCDir],
   LIBPATH=pathObj.grpcLibPaths
   )
+env.archObj = archObj
 env.pathObj = pathObj
 
+if archObj.isWindows:
+  env.Replace(CPPFLAGS='/MD',
+              CPPDEFINES={'_WIN32_WINNT' : '0x600'})
 
 def _getRootList():
   for root, _, files in os.walk(pathObj.srcDir):
