@@ -84,17 +84,17 @@ class BuildPath(object):
                                  'grpc_install',
                                  archObj.sysDirName)
     
-    self.__protocExePath = os.path.join(__grpcInstall,
-                                        'bin',
-                                        'protoc')
     self.__grpcIncludePaths = [os.path.join(__grpcInstall, 'include')]
     self.__grpcLibPaths = [os.path.join(__grpcInstall, 'lib')]
     
-    __grpcPluginsPath = os.path.join(__grpcInstall, 'plugins')
-    
     _pluginExt = '.exe' if archObj.isWindows else ''
-    self.__grpcCPPPlugin = os.path.join(__grpcPluginsPath, 'grpc_cpp_plugin' + _pluginExt)
-    self.__grpcPythonPlugin = os.path.join(__grpcPluginsPath, 'grpc_python_plugin' + _pluginExt)
+    _grpcBinPath = os.path.join(__grpcInstall, 'bin')
+    self.__protocExePath = os.path.join(_grpcBinPath,
+                                        'protoc' + _pluginExt)
+    self.__grpcCPPPlugin = os.path.join(_grpcBinPath,
+                                        'grpc_cpp_plugin' + _pluginExt)
+    self.__grpcPythonPlugin = os.path.join(_grpcBinPath,
+                                           'grpc_python_plugin' + _pluginExt)
     
     def _exist(path):
       if not os.path.exists(path):
