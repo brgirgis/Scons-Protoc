@@ -95,6 +95,8 @@ class BuildPath(object):
                                         'grpc_cpp_plugin' + _pluginExt)
     self.__grpcPythonPlugin = os.path.join(_grpcBinPath,
                                            'grpc_python_plugin' + _pluginExt)
+    self.__grpcJavaPlugin = os.path.join(_grpcBinPath,
+                                        'grpc_java_plugin' + _pluginExt)
     
     def _exist(path):
       if not os.path.exists(path):
@@ -111,6 +113,8 @@ class BuildPath(object):
                                                'cc'))
     self.__buildGenPYDir = _exist(os.path.join(self.__buildGenDir,
                                                'py'))
+    self.__buildGenJavaDir = _exist(os.path.join(self.__buildGenDir,
+                                                 'java'))
     
   
   @property
@@ -134,6 +138,10 @@ class BuildPath(object):
     return self.__buildGenPYDir
   
   @property
+  def buildGenJavaDir(self):
+    return self.__buildGenJavaDir
+  
+  @property
   def protocExePath(self):
     return self.__protocExePath
   
@@ -152,6 +160,10 @@ class BuildPath(object):
   @property
   def grpcPythonPlugin(self):
     return self.__grpcPythonPlugin
+  
+  @property
+  def grpcJavaPlugin(self):
+    return self.__grpcJavaPlugin
   
   def summary(self):
     lstr = '='*50 + '\n'
@@ -181,6 +193,7 @@ env = Environment(
   PROTOC=pathObj.protocExePath,
   PROTOC_GRPC_CC = pathObj.grpcCPPPlugin,
   PROTOC_GRPC_PY = pathObj.grpcPythonPlugin,
+  PROTOC_GRPC_JAVA = pathObj.grpcJavaPlugin,
   PROTOC_DEBUG=True,
   CPPPATH=pathObj.grpcIncludePaths + [pathObj.buildGenCCDir],
   LIBPATH=pathObj.grpcLibPaths

@@ -2,9 +2,8 @@ Import('env')
 
 protoc_out = env.Protoc(["../protos/helloworld.proto"],
                        PROTOC_CCOUT=env.pathObj.buildGenCCDir,
-                       PROTOC_GRPC_CCOUT=env.pathObj.buildGenCCDir,
                        PROTOC_PYOUT=env.pathObj.buildGenPYDir,
-                       PROTOC_GRPC_PYOUT=env.pathObj.buildGenPYDir,
+                       PROTOC_JAVAOUT=env.pathObj.buildGenJavaDir,
                       )
 
 protoc_c = []
