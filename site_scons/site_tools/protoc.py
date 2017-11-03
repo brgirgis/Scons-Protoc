@@ -16,15 +16,6 @@ import os
 import SCons.Util
 from SCons.Script import Builder, Action
 
-def _detect(env):
-    """Try to find the Protoc compiler"""
-    protoc = env.get('PROTOC') or env.Detect('protoc')
-    if protoc:
-        return protoc
-    raise SCons.Errors.StopError(
-        "Could not detect protoc Compiler")
-    
-
 def _protoc_emitter(target, source, env):
     """Process target, sources, and flags"""
     from SCons.Script import File, Dir
@@ -170,39 +161,109 @@ _protoc_builder = Builder(
     emitter = _protoc_emitter,
 )
 
-def generate(env):
+def _multiGet(kwd,
+              defaultVal,
+              kwargs,
+              env):
+  return kwargs.get(kwd) or \
+         env.get(kwd) or \
+         defaultVal
+
+def _detect(env,
+            kwargs):
+    """Try to find the Protoc compiler"""
+    protoc = _multiGet('PROTOC',
+                       '',
+                       env,
+                       kwargs) or \
+             env.Detect('protoc')
+    if protoc:
+        return protoc
+    raise SCons.Errors.StopError(
+        "Could not detect protoc Compiler")
+    
+
+def generate(env,
+             **kwargs):
     """Add Builders and construction variables."""
-    env['PROTOC'] = _detect(env)
+    env['PROTOC'] = _detect(env, kwargs)
+    
     env.SetDefault(
         # Additional command-line flags
-        PROTOC_FLAGS = SCons.Util.CLVar(''),
+        PROTOC_FLAGS = _multiGet('PROTOC_FLAGS',
+                                 SCons.Util.CLVar(''),
+                                 env,
+                                 kwargs),
         
         # Source path(s)
-        PROTOC_PATH = SCons.Util.CLVar(''),
+        PROTOC_PATH = _multiGet('PROTOC_PATH',
+                                SCons.Util.CLVar(''),
+                                env,
+                                kwargs),
         
         # Plugins path
-        PROTOC_GRPC_CC = '',
-        PROTOC_GRPC_PY = '',
+        PROTOC_GRPC_CC = _multiGet('PROTOC_GRPC_CC',
+                                   '',
+                                   env,
+                                   kwargs),
+        PROTOC_GRPC_PY = _multiGet('PROTOC_GRPC_PY',
+                                   '',
+                                   env,
+                                   kwargs),
         
         # Output path
-        PROTOC_CCOUT = '',
-        PROTOC_GRPC_CCOUT = '',
+        PROTOC_CCOUT      = _multiGet('PROTOC_CCOUT',
+                                      '',
+                                      env,
+                                      kwargs),
+        PROTOC_GRPC_CCOUT = _multiGet('PROTOC_GRPC_CCOUT',
+                                      '',
+                                      env,
+                                      kwargs),
         
-        PROTOC_PYOUT = '',
-        PROTOC_GRPC_PYOUT = '',
+        PROTOC_PYOUT      = _multiGet('PROTOC_PYOUT',
+                                      '',
+                                      env,
+                                      kwargs),
+        PROTOC_GRPC_PYOUT = _multiGet('PROTOC_GRPC_PYOUT',
+                                      '',
+                                      env,
+                                      kwargs),
         
         # Suffixies / prefixes
-        PROTOC_SUFFIX = '.proto',
+        PROTOC_SUFFIX = _multiGet('PROTOC_SUFFIX',
+                                  '.proto',
+                                  env,
+                                  kwargs),
         
         # C++
-        PROTOC_HSUFFIX = '.pb.h',
-        PROTOC_CCSUFFIX = '.pb.cc',
-        PROTOC_GRPC_HSUFFIX = '.grpc.pb.h',
-        PROTOC_GRPC_CCSUFFIX = '.grpc.pb.cc',
+        PROTOC_HSUFFIX  = _multiGet('PROTOC_HSUFFIX',
+                                    '.pb.h',
+                                    env,
+                                    kwargs),
+        PROTOC_CCSUFFIX = _multiGet('PROTOC_CCSUFFIX',
+                                    '.pb.cc',
+                                    env,
+                                    kwargs),
+        
+        PROTOC_GRPC_HSUFFIX  = _multiGet('PROTOC_GRPC_HSUFFIX',
+                                         '.grpc.pb.h',
+                                         env,
+                                         kwargs),
+        PROTOC_GRPC_CCSUFFIX = _multiGet('PROTOC_GRPC_CCSUFFIX',
+                                         '.grpc.pb.cc',
+                                         env,
+                                         kwargs),
         
         # Python
-        PROTOC_PYSUFFIX = '_pb2.py',
-        PROTOC_GRPC_PYSUFFIX = '_pb2_grpc.py',
+        PROTOC_PYSUFFIX      = _multiGet('PROTOC_PYSUFFIX',
+                                         '_pb2.py',
+                                         env,
+                                         kwargs),
+        PROTOC_GRPC_PYSUFFIX = _multiGet('PROTOC_GRPC_PYSUFFIX',
+                                         '_pb2_grpc.py',
+                                         env,
+                                         kwargs),
         
         # Protoc command
         PROTOC_COM = "$PROTOC $PROTOC_FLAGS $SOURCES.abspath",
@@ -214,4 +275,4 @@ def generate(env):
     
 
 def exists(env):
-    return _detect(env)
+    return _detect(env, {})
