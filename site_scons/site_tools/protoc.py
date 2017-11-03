@@ -1,12 +1,11 @@
 """
-Google's Protoc builder
+Google's Protoc compiler builder
 
-Example, will produce c++ output files in the src directory.
+This builder invokes the protoc compiler to generate C++, Python, and Java
+files for both protobuf messages and GRPC services.
 
-protoc_cc = env.Protoc(["src/Example.proto"],
-    PROTOC_PATH='#src',
-    PROTOC_CCOUT='#src',
-    )
+Original authors: Peter Cooner, Scott Stafford, Steven Haywood (may be more!)
+Modified by Bassem Girgis
 
 """
 
@@ -343,10 +342,10 @@ def generate(env,
                                    kwargs),
         
         # output
-        PROTOC_CCOUT      = _multiGet('PROTOC_CCOUT',
-                                      '',
-                                      env,
-                                      kwargs),
+        PROTOC_CCOUT = _multiGet('PROTOC_CCOUT',
+                                 '',
+                                 env,
+                                 kwargs),
         
         #
         # Python
@@ -369,10 +368,10 @@ def generate(env,
                                      kwargs),
         
         # output
-        PROTOC_PYOUT      = _multiGet('PROTOC_PYOUT',
-                                      '',
-                                      env,
-                                      kwargs),
+        PROTOC_PYOUT = _multiGet('PROTOC_PYOUT',
+                                 '',
+                                 env,
+                                 kwargs),
         
         #
         # Java
@@ -395,10 +394,10 @@ def generate(env,
                                      kwargs),
         
         # output
-        PROTOC_JAVAOUT      = _multiGet('PROTOC_JAVAOUT',
-                                        '',
-                                        env,
-                                        kwargs),
+        PROTOC_JAVAOUT = _multiGet('PROTOC_JAVAOUT',
+                                   '',
+                                   env,
+                                   kwargs),
         
     )
     
