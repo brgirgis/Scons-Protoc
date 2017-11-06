@@ -6,6 +6,14 @@ protoc_out = env.Protoc(["../protos/helloworld.proto"],
                         PROTOC_JAVAOUT=env.pathObj.buildGenJavaDir,
                       )
 
+env.Protoc(["../protos/auth_sample.proto",
+            "../protos/hellostreamingworld.proto",
+            "../protos/route_guide.proto"],
+           PROTOC_CCOUT=env.pathObj.buildGenCCDir,
+           PROTOC_PYOUT=env.pathObj.buildGenPYDir,
+           PROTOC_JAVAOUT=env.pathObj.buildGenJavaDir,
+          )
+
 protoc_c = []
 for file in protoc_out:
   if '.cc' not in str(file):
